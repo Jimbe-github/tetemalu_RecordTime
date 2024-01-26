@@ -1,12 +1,13 @@
 package com.example.tetemalu.recordtime;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.*;
 
 import android.os.Bundle;
 
 import java.time.LocalDate;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends AppCompatActivity {
   private static final String REQUESTKEY_MONTH_FRAGMENT = "month_fragment";
 
   @Override
