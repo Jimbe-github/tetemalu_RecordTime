@@ -5,6 +5,12 @@
 こちらの都合と、 java では一般的にパッケージ名は小文字のためです。
 (ついでにクラス名や変数名にアンダーバーは使いません。定数名は全部大文字にするのでアンダーバーを使います。)
 
+適切な命名を意識する
+https://zenn.dev/solxyz_bso/articles/a854ed668c1d3a
+
+Java言語の命名指針
+https://qiita.com/rkonno/items/1b30daf83854fecbb814
+
 日付のクリックの検出用に Adapter に setDateClickListener メソッドを追加しています。<br>
 クリックからの画面遷移には Fragment Result を使っています。
 
