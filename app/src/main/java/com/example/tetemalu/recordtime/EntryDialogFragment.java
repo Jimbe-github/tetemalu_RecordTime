@@ -2,6 +2,7 @@ package com.example.tetemalu.recordtime;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import androidx.annotation.*;
@@ -45,12 +46,13 @@ public class EntryDialogFragment extends DialogFragment {
 
     EditText titleEdit = new EditText(getContext());
     titleEdit.setHint("title");
+    titleEdit.requestFocus();
     if(title != null) {
       titleEdit.setText(title);
       titleEdit.setSelection(0, titleEdit.getText().length());
     }
 
-    return new AlertDialog.Builder(getContext())
+    Dialog dialog = new AlertDialog.Builder(getContext())
             .setTitle(date.toString())
             .setView(titleEdit)
             .setPositiveButton("登録", (d,w) -> {
@@ -62,5 +64,7 @@ public class EntryDialogFragment extends DialogFragment {
             })
             .setNegativeButton("キャンセル", null)
             .create();
+    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+    return dialog;
   }
 }

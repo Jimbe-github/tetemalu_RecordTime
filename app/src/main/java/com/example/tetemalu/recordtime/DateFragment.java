@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.*;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class DateFragment extends Fragment {
   private static final String ARGS_DATE = "date";
@@ -46,15 +47,14 @@ public class DateFragment extends Fragment {
     dateText.setText(date.toString());
 
     MainViewModel model = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+    FragmentManager fm = getChildFragmentManager();
 
-    Adapter adapter = new Adapter();
+    Adapter adapter = new Adapter(entry -> EntryDialogFragment.getInstance(date, entry.title, entry.id).show(fm, null));
     model.getEntryList().observe(getViewLifecycleOwner(), adapter::setList);
 
     RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
     recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
     recyclerView.setAdapter(adapter);
-
-    FragmentManager fm = getChildFragmentManager();
 
     fm.setFragmentResultListener("Entry", getViewLifecycleOwner(), (rkey,result) -> {
       int id = result.getInt(EntryDialogFragment.RESULT_ID, Entry.INVALID_ID);
@@ -74,6 +74,11 @@ public class DateFragment extends Fragment {
 
   private static class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     private final List<Entry> list = new ArrayList<>();
+    private final Consumer<Entry> entryClickListener;
+
+    Adapter(Consumer<Entry> entryClickListener) {
+      this.entryClickListener = entryClickListener;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     void setList(List<Entry> newList) {
@@ -98,15 +103,21 @@ public class DateFragment extends Fragment {
       return list.size();
     }
 
-    private static class ViewHolder extends RecyclerView.ViewHolder {
+    private class ViewHolder extends RecyclerView.ViewHolder {
       private final TextView textView;
+
+      private Entry entry;
 
       private ViewHolder(@NonNull ViewGroup parent) {
         super(LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false));
         textView = itemView.findViewById(android.R.id.text1);
+        textView.setOnClickListener(v -> {
+          if(entryClickListener != null) entryClickListener.accept(entry);
+        });
       }
 
       void bind(Entry entry) {
+        this.entry = entry;
         textView.setText(entry.title);
       }
     }
