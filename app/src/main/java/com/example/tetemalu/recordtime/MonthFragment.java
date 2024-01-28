@@ -134,7 +134,7 @@ public class MonthFragment extends Fragment {
       private LocalDate date;
 
       ViewHolder(@NonNull ViewGroup parent) {
-        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.date_viewholder, parent, false));
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.date, parent, false));
         dateBox = itemView.findViewById(R.id.every_date);
         dateBox.setClickable(true);
         dateBox.setOnClickListener(v -> {

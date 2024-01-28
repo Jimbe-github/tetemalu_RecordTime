@@ -1,13 +1,18 @@
 package com.example.tetemalu.recordtime;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
+import android.text.TextUtils;
+import android.view.*;
+import android.widget.*;
 
 import androidx.annotation.*;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.*;
+import androidx.lifecycle.*;
+import androidx.recyclerview.widget.*;
 
 import java.time.LocalDate;
+import java.util.*;
 
 public class DateFragment extends Fragment {
   private static final String ARGS_DATE = "date";
@@ -37,18 +42,73 @@ public class DateFragment extends Fragment {
     LocalDate date = args == null ? null : (LocalDate)args.getSerializable(ARGS_DATE);
     if(date == null) throw new IllegalArgumentException("Parameter 'date' is missing");
 
-    // 〇月をセット
-    TextView month_textview = view.findViewById(R.id.selected_month);
-    month_textview.setText(String.valueOf(date.getMonthValue()));
+    TextView dateText = view.findViewById(R.id.date);
+    dateText.setText(date.toString());
 
-    // 〇日をセット
-    TextView date_textview = view.findViewById(R.id.selected_date);
-    date_textview.setText(String.valueOf(date.getDayOfMonth()));
+    MainViewModel model = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-    // 日付カレンダーフラグメントを設定(フラグメント自身のフラグメントマネージャは getChildFragmentManager で得る)
-    getChildFragmentManager().beginTransaction()
-            .replace(R.id.fragmentContainerView, new DailyCalendarFragment())
-            .addToBackStack(null)
-            .commit();
+    Adapter adapter = new Adapter();
+    model.getEntryList().observe(getViewLifecycleOwner(), adapter::setList);
+
+    RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+    recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
+    recyclerView.setAdapter(adapter);
+
+    FragmentManager fm = getChildFragmentManager();
+
+    fm.setFragmentResultListener("Entry", getViewLifecycleOwner(), (rkey,result) -> {
+      int id = result.getInt(EntryDialogFragment.RESULT_ID, Entry.INVALID_ID);
+      String title = result.getString(EntryDialogFragment.RESULT_TITLE, null);
+      LiveData<Entry> entryLiveData =
+              id == Entry.INVALID_ID   ? model.insert(date, title) :
+              TextUtils.isEmpty(title) ? model.delete(id) :
+                                         model.update(id, title);
+      entryLiveData.observe(getViewLifecycleOwner(), entry -> model.requestEntryList(date));
+    });
+
+    Button addButton = view.findViewById(R.id.add);
+    addButton.setOnClickListener(v -> EntryDialogFragment.getInstance(date, null, Entry.INVALID_ID).show(fm, null));
+
+    model.requestEntryList(date);
+  }
+
+  private static class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
+    private final List<Entry> list = new ArrayList<>();
+
+    @SuppressLint("NotifyDataSetChanged")
+    void setList(List<Entry> newList) {
+      list.clear();
+      list.addAll(newList); //防御コピー
+      notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public Adapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+      return new Adapter.ViewHolder(parent);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull Adapter.ViewHolder holder, int position) {
+      holder.bind(list.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+      return list.size();
+    }
+
+    private static class ViewHolder extends RecyclerView.ViewHolder {
+      private final TextView textView;
+
+      private ViewHolder(@NonNull ViewGroup parent) {
+        super(LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false));
+        textView = itemView.findViewById(android.R.id.text1);
+      }
+
+      void bind(Entry entry) {
+        textView.setText(entry.title);
+      }
+    }
   }
 }
