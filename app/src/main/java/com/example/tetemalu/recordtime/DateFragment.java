@@ -31,7 +31,7 @@ public class DateFragment extends Fragment {
     return fragment;
   }
 
-  DateFragment() {
+  public DateFragment() {
     super(R.layout.date_fragment);
   }
 

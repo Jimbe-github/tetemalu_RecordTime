@@ -37,7 +37,7 @@ public class MonthFragment extends Fragment {
     return fragment;
   }
 
-  MonthFragment() {
+  public MonthFragment() {
     super(R.layout.month_fragment);
   }
 
