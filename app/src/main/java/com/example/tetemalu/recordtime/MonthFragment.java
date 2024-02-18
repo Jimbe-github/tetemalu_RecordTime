@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.*;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,24 +21,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class MonthFragment extends Fragment {
-  static final String RESULT_DATE = "date";
-
-  private static final String ARGS_REQUESTKEY = "request_key";
-
-  /**
-   * MonthFragment を生成する際はこのメソッドを使用すること
-   * @param requestKey 日付をクリックした際に親に通知するリクエストキー
-   * @return MonthFragment オブジェクト
-   */
-  static MonthFragment getInstance(@NonNull String requestKey) {
-    MonthFragment fragment = new MonthFragment();
-    Bundle args = new Bundle();
-    args.putString(ARGS_REQUESTKEY, requestKey);
-    fragment.setArguments(args);
-    return fragment;
-  }
-
-  MonthFragment() {
+  public MonthFragment() {
     super(R.layout.month_fragment);
   }
 
@@ -45,24 +29,17 @@ public class MonthFragment extends Fragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    Bundle args = getArguments();
-    String requestKey = args == null ? null : args.getString(ARGS_REQUESTKEY, null);
-    if(requestKey == null) throw new IllegalArgumentException("Parameter 'requestKey' is missing");
+    MainViewModel model = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-    TextView yearText = view.findViewById(R.id.year);
     TextView monthText = view.findViewById(R.id.month);
 
     Adapter adapter = new Adapter(yearMonth -> {
-      //アダプタの年月を貰って表示する
-      yearText.setText(yearMonth.getYear() + "年");
-      monthText.setText(yearMonth.getMonthValue() + "月");
+      monthText.setText(yearMonth.getYear() + "年" + yearMonth.getMonthValue() + "月");
     });
 
     adapter.setDateClickListener(date -> {
-      //日付がクリックされたら FragmentManager を通じて親に通知
-      Bundle result = new Bundle();
-      result.putSerializable(RESULT_DATE, date);
-      getParentFragmentManager().setFragmentResult(requestKey, result);
+      //日付がクリックされたら日付を設定(これによって MainActivity のオブザーバが動く)
+      model.setSelectedDate(date);
     });
 
     Button next = view.findViewById(R.id.next);
@@ -71,7 +48,7 @@ public class MonthFragment extends Fragment {
     Button prev = view.findViewById(R.id.prev);
     prev.setOnClickListener(v -> adapter.prev());
 
-    RecyclerView recyclerView = view.findViewById(R.id.date_recycler_view_container);
+    RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
     recyclerView.setHasFixedSize(true);
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 7));
     recyclerView.setAdapter(adapter);
@@ -134,8 +111,8 @@ public class MonthFragment extends Fragment {
       private LocalDate date;
 
       ViewHolder(@NonNull ViewGroup parent) {
-        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.date_viewholder, parent, false));
-        dateBox = itemView.findViewById(R.id.every_date);
+        super(LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_day, parent, false));
+        dateBox = itemView.findViewById(R.id.day);
         dateBox.setClickable(true);
         dateBox.setOnClickListener(v -> {
           if(dateClickListener != null && date != null) dateClickListener.accept(date);
