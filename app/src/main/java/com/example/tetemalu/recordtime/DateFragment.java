@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.*;
 import androidx.fragment.app.*;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.*;
 import androidx.recyclerview.widget.*;
 
 import java.util.*;
@@ -26,22 +26,25 @@ public class DateFragment extends Fragment {
     TextView year_text = view.findViewById(R.id.selected_year);
     TextView month_text = view.findViewById(R.id.selected_month);
     TextView date_text = view.findViewById(R.id.selected_date);
-
     model.getSelectedDate().observe(getViewLifecycleOwner(), date -> {
-      year_text.setText(date.getYear() + " 年");
-      month_text.setText(date.getMonthValue() + " 月");
-      date_text.setText(date.getDayOfMonth() + " 日");
+      if(date == null) {
+        year_text.setText("--");
+        month_text.setText("--");
+        date_text.setText("--");
+      } else {
+        year_text.setText(date.getYear() + " 年");
+        month_text.setText(date.getMonthValue() + " 月");
+        date_text.setText(date.getDayOfMonth() + " 日");
+      }
     });
 
     Adapter adapter = new Adapter();
+    model.getTimeTable().observe(getViewLifecycleOwner(), adapter::setList);
 
     RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
     recyclerView.setHasFixedSize(true);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     recyclerView.setAdapter(adapter);
-
-    TimeTableDao timeTableDao = AppDatabase.getInstance(getContext()).getTimeTableDao();
-    timeTableDao.getAll().observe(getViewLifecycleOwner(), adapter::setList);
   }
 
   private static class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {

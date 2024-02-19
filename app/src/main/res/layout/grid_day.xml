@@ -3,9 +3,8 @@
     android:id="@+id/day"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:autoSizeTextType="uniform"
     android:ellipsize="end"
     android:maxLines="1"
     android:text="21"
     android:textAlignment="center"
-    android:textSize="30sp" />
+    android:textSize="26sp" />
