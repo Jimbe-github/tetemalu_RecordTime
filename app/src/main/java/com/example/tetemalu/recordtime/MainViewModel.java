@@ -1,7 +1,5 @@
 package com.example.tetemalu.recordtime;
 
-import android.util.Log;
-
 import androidx.lifecycle.*;
 
 import java.time.*;
@@ -27,18 +25,13 @@ public class MainViewModel extends ViewModel {
     selectedDateLiveData.setValue(date);
   }
 
-  private AppDatabase appDatabase;
-  void setDatabase(AppDatabase appDatabase) {
-    this.appDatabase = appDatabase;
-  }
-
   //selectedDate が設定されたら DB から該当データを取得して自身を更新する.
   private final LiveData<List<TimeTableEntity>> timeTableLiveData =
           Transformations.switchMap(selectedDateLiveData, date -> {
             if(date == null) return new MutableLiveData<>(Collections.emptyList());
             LocalDateTime start = date.atStartOfDay();
             LocalDateTime endExclusive = start.plusDays(1);
-            TimeTableDao timeTableDao = appDatabase.getTimeTableDao();
+            TimeTableDao timeTableDao = AppDatabase.getInstance().getTimeTableDao();
             return timeTableDao.getAllWithinRange(start, endExclusive);
           });
   LiveData<List<TimeTableEntity>> getTimeTable() {

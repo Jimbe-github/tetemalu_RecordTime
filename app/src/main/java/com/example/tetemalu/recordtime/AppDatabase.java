@@ -38,6 +38,9 @@ public abstract class AppDatabase extends RoomDatabase {
     }
     return INSTANCE;
   }
+  synchronized static AppDatabase getInstance() {
+    return INSTANCE;
+  }
 
   public abstract TimeTableDao getTimeTableDao();
 }

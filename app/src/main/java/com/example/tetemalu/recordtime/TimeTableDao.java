@@ -14,6 +14,6 @@ public interface TimeTableDao {
   @Query("SELECT * FROM TimeTable")
   LiveData<List<TimeTableEntity>> getAll();
 
-  @Query("SELECT * FROM TimeTable WHERE :start <= datetime AND datetime < :endExclusive")
+  @Query("SELECT * FROM TimeTable WHERE :start <= datetime AND datetime < :endExclusive ORDER BY datetime")
   LiveData<List<TimeTableEntity>> getAllWithinRange(LocalDateTime start, LocalDateTime endExclusive);
 }
