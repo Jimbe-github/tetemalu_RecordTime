@@ -25,7 +25,7 @@ public class MonthFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 
-    MainViewModel model = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+    MainViewModel model = MainViewModel.getInstance(requireActivity());
 
     TextView monthText = view.findViewById(R.id.month);
     model.getCurrent().observe(getViewLifecycleOwner(), yearMonth -> {
