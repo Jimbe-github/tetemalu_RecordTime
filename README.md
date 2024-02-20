@@ -1,24 +1,7 @@
-修正したファイルだけ置いています。<br>
-(MonthFragment のアダプタは回答同様 MonthFragment に含めました。)
+データを Room に置くようにし、フラグメント間は ViewModel で同期、全体のレイアウトは SlidingPaneLayout に任せて、縦画面でスライド、横画面で(可能なら) 2 ペインになるようにしてみました。
 
-**パッケージ名が変わっています。**
-こちらの都合と、 java では一般的にパッケージ名は小文字のためです。
-(ついでにクラス名や変数名にアンダーバーは使いません。定数名は全部大文字にするのでアンダーバーを使います。)
+縦画面<br>
+![エミュレータスクリーンショット](https://github.com/Jimbe-github/tetemalu_RecordTime/assets/62501697/49be318a-1c28-4852-9dd2-0af71db2f2ca)
 
-適切な命名を意識する
-https://zenn.dev/solxyz_bso/articles/a854ed668c1d3a
-
-Java言語の命名指針
-https://qiita.com/rkonno/items/1b30daf83854fecbb814
-
-日付のクリックの検出用に Adapter に setDateClickListener メソッドを追加しています。<br>
-クリックからの画面遷移には Fragment Result を使っています。
-
-https://developer.android.com/guide/fragments/communicate?hl=ja#fragment-result
-
-このようにすることで MonthFragment には親が何なのか/遷移なのかすら記述は無くなります。<br>
-MonthFragment にも Argments が必要になったため、生成用メソッド(getInstance) を DateFragment と共に作りました。
-
-DateFragment 内に配置する DailyCalendarFragment は DateFragment のコンストラクタで設定しています。<br>
-アクティビティがフラグメントマネージャ持っていて getSupportFragmentManager() で得られるように、
-フラグメントも自身のフラグメントマネージャを持っていて getChildFragmentManager() で得られ、自身のレイアウトに配置するのに使えます。
+横画面<br>
+![エミュレータスクリーンショット](https://github.com/Jimbe-github/tetemalu_RecordTime/assets/62501697/7a5e99b9-86f5-40bb-a3e7-54d4b4e946af)
